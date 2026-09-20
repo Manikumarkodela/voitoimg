@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiToImg — Voice & Text AI Studio</title>
+    <meta name="description" content="Next-gen Voice & AI Image Generation Studio powered by Google Gemini & Imagen 3.">
+    
+    <!-- Google Fonts: JetBrains Mono, Plus Jakarta Sans, Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400..800;1,400..800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- App Stylesheet -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+    <!-- Background Layer & Tint -->
+    <div class="bg-overlay"></div>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="app-viewport">
+
+        <!-- Top Navigation / Brand Header -->
+        <header class="app-header">
+            <div class="brand-container">
+                <div class="brand-logo-icon">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div class="brand-text-group">
+                    <h1 class="brand-title">VoiToImg</h1>
+                    <span class="brand-subtitle">AI & Voice Studio</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="status-indicator" id="system-status-pill">
+                    <span class="pulse-dot online"></span>
+                    <span id="system-status-text">Ready</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Interactive Console (Centered Layout) -->
+        <main class="main-container">
+
+            <!-- Hero Section -->
+            <section class="hero-section">
+                
+                <div class="hero-headline">
+                    <h2>Transform Thoughts into <span class="gradient-text">Visual Art</span></h2>
+                </div>
+
+                <!-- Gemini Pill Search Bar (In Middle) -->
+                <div class="gemini-search-container">
+                    
+                    <div class="gemini-pill-bar" id="gemini-pill-bar">
+                        
+                        <!-- Left Plus Menu Trigger -->
+                        <div class="plus-wrapper">
+                            <button id="plus-btn" class="plus-icon-btn" title="Add tools, style & options">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+
+                            <!-- Floating Gemini-Style Popup Menu -->
+                            <div class="plus-popover-menu hidden" id="plus-popover-menu">
+                                
+                                <div class="menu-section">
+                                    <input type="file" id="image-upload-input" accept="image/*" class="hidden">
+                                    <div class="menu-item" id="plus-upload-item">
+                                        <i class="fa-solid fa-paperclip menu-icon"></i>
+                                        <span>Upload Reference Image</span>
+                                    </div>
+                                </div>
+
+                                <div class="menu-divider"></div>
+
+                                <div class="menu-section">
+                                    <div class="menu-label"><i class="fa-solid fa-layer-group"></i> Engine Mode</div>
+                                    <div class="menu-options-grid" id="mode-options-grid">
+                                        <button class="opt-btn active" data-type="mode" data-value="ai_gen">🎨 AI Gen (Imagen 3)</button>
+                                        <button class="opt-btn" data-type="mode" data-value="internet">🌐 Web Search</button>
+                                        <button class="opt-btn" data-type="mode" data-value="dual">⚡ Dual Engine</button>
+                                    </div>
+                                </div>
+
+                                <div class="menu-divider"></div>
+
+                                <div class="menu-section">
+                                    <div class="menu-label"><i class="fa-solid fa-crop-simple"></i> Aspect Ratio</div>
+                                    <div class="menu-options-grid" id="aspect-options-grid">
+                                        <button class="opt-btn active" data-type="aspect" data-value="1:1">📷 1:1 Square</button>
+                                        <button class="opt-btn" data-type="aspect" data-value="16:9">📺 16:9 Wide</button>
+                                        <button class="opt-btn" data-type="aspect" data-value="9:16">📱 9:16 Portrait</button>
+                                        <button class="opt-btn" data-type="aspect" data-value="4:3">🖼️ 4:3 Standard</option>
+                                        <button class="opt-btn" data-type="aspect" data-value="3:4">📄 3:4 Tall</button>
+                                    </div>
+                                </div>
+
+                                <div class="menu-divider"></div>
+
+                                <div class="menu-section">
+                                    <div class="menu-label"><i class="fa-solid fa-palette"></i> Style Preset</div>
+                                    <div class="menu-options-grid" id="style-options-grid">
+                                        <button class="opt-btn active" data-type="style" data-value="real_photo">📷 Real Photo</button>
+                                        <button class="opt-btn" data-type="style" data-value="cinematic">🎬 Cinematic</button>
+                                        <button class="opt-btn" data-type="style" data-value="studio_portrait">👤 Studio Portrait</button>
+                                        <button class="opt-btn" data-type="style" data-value="landscape">🌄 Landscape</button>
+                                        <button class="opt-btn" data-type="style" data-value="cyberpunk">🌃 Cyberpunk</button>
+                                        <button class="opt-btn" data-type="style" data-value="anime">🎨 Anime / Art</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Center Text Input Bar -->
+                        <div class="input-center">
+                            <input type="text" id="prompt-input" placeholder="Ask VoiToImg or describe vision..." autocomplete="off">
+                            <button id="clear-btn" class="clear-icon-btn hidden" title="Clear">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+
+                        <!-- Right Control Buttons (Engine Pill, Mic, Send) -->
+                        <div class="right-controls">
+                            
+                            <!-- Selected Mode Pill Indicator with Dedicated Dropdown -->
+                            <div class="mode-dropdown-wrapper">
+                                <button type="button" class="mode-pill-badge" id="active-mode-badge" title="Select Engine Mode">
+                                    <span id="active-mode-text">Imagen 3</span>
+                                    <i class="fa-solid fa-chevron-down pill-arrow"></i>
+                                </button>
+
+                                <div class="mode-dropdown-menu hidden" id="mode-dropdown-menu">
+                                    <div class="mode-dropdown-item active" data-mode="ai_gen">
+                                        <i class="fa-solid fa-wand-magic-sparkles mode-item-icon"></i>
+                                        <div class="mode-item-text">
+                                            <div class="mode-item-title">Imagen 3</div>
+                                            <div class="mode-item-desc">Google AI Generation</div>
+                                        </div>
+                                    </div>
+                                    <div class="mode-dropdown-item" data-mode="internet">
+                                        <i class="fa-solid fa-globe mode-item-icon"></i>
+                                        <div class="mode-item-text">
+                                            <div class="mode-item-title">Web Search</div>
+                                            <div class="mode-item-desc">Real-time Web Images</div>
+                                        </div>
+                                    </div>
+                                    <div class="mode-dropdown-item" data-mode="dual">
+                                        <i class="fa-solid fa-bolt mode-item-icon"></i>
+                                        <div class="mode-item-text">
+                                            <div class="mode-item-title">Dual Engine</div>
+                                            <div class="mode-item-desc">Combined Search & AI</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Voice Microphone Button -->
+                            <button id="voice-btn" class="pill-mic-btn" title="Speak command">
+                                <i class="fa-solid fa-microphone"></i>
+                            </button>
+
+                            <!-- Send / Generate Button -->
+                            <button id="generate-btn" class="pill-send-btn" title="Generate or Search">
+                                <i class="fa-solid fa-sparkles"></i>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Voice Visualizer Bar (Hidden when idle) -->
+                    <div class="visualizer-bar hidden" id="visualizer-container">
+                        <canvas id="visualizer-canvas" width="500" height="20"></canvas>
+                        <span id="voice-status-text" class="voice-status-label">Listening...</span>
+                    </div>
+
+                    <!-- Active Configuration Badges below search bar -->
+                    <div class="active-config-bar" id="active-config-bar">
+                        <span class="config-chip" id="chip-mode-val"><i class="fa-solid fa-wand-magic-sparkles"></i> Imagen 3</span>
+                        <span class="config-chip" id="chip-aspect-val"><i class="fa-solid fa-crop-simple"></i> 1:1 Square</span>
+                        <span class="config-chip" id="chip-style-val"><i class="fa-solid fa-camera"></i> Real Photo</span>
+                        <span class="config-chip hidden" id="chip-upload-val"><i class="fa-solid fa-paperclip"></i> Photo Attached</span>
+                    </div>
+
+                </div>
+
+                <!-- Quick Prompt Suggestions Chips -->
+                <div class="quick-prompts-container">
+                    <div class="chip-scroll-wrapper">
+                        <button class="prompt-chip" data-prompt="A ultra-realistic futuristic supercar driving through wet neon city streets, 8k resolution">
+                            <i class="fa-solid fa-car"></i> Supercar
+                        </button>
+                        <button class="prompt-chip" data-prompt="Studio portrait photo of an astronaut reflecting a glowing nebula on helmet visor">
+                            <i class="fa-solid fa-user-astronaut"></i> Astronaut
+                        </button>
+                        <button class="prompt-chip" data-prompt="Breathtaking serene mountain peak above clouds at golden hour sunrise, hyper-detailed photography">
+                            <i class="fa-solid fa-mountain-sun"></i> Mountain Sunrise
+                        </button>
+                        <button class="prompt-chip" data-prompt="Modern minimalist glass cliff house overlooking turquoise ocean waters at sunset">
+                            <i class="fa-solid fa-house"></i> Luxury Villa
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Results Showcase Section -->
+            <section class="results-section hidden" id="results-section">
+                
+                <div class="results-header-card">
+                    <div class="results-header-left">
+                        <div class="icon-badge"><i class="fa-solid fa-images"></i></div>
+                        <div>
+                            <h3 id="results-title">Generated Images</h3>
+                            <p class="query-display">Prompt: <span id="search-query-text">-</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="results-header-right">
+                        <span id="result-count-badge" class="badge">0 Results</span>
+                    </div>
+                </div>
+
+                <!-- Skeleton Loader State -->
+                <div class="loading-container hidden" id="loading-box">
+                    <div class="loader-spinner">
+                        <div class="spinner-ring"></div>
+                        <i class="fa-solid fa-sparkles spinner-icon"></i>
+                    </div>
+                    <h3 id="loading-title">Synthesizing Artwork...</h3>
+                    <p id="loading-desc">Gemini LLM is crafting high-resolution image</p>
+                </div>
+
+                <!-- Main Image Grid -->
+                <div class="results-grid" id="results-grid"></div>
+            </section>
+
+            <!-- Session History & Gallery Section -->
+            <section class="gallery-section hidden" id="gallery-section">
+                <div class="gallery-card">
+                    <div class="gallery-header">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <h3>Recent Gallery</h3>
+                    </div>
+                    <div class="gallery-scroll" id="gallery-row"></div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Lightbox Image Modal -->
+    <div class="lightbox-overlay hidden" id="lightbox-modal">
+        <div class="lightbox-card">
+            <button id="close-lightbox-btn" class="lightbox-close-btn" title="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="lightbox-media-container">
+                <img id="lightbox-image" src="" alt="Expanded Image">
+            </div>
+
+            <div class="lightbox-footer">
+                <div class="lightbox-meta">
+                    <h4 id="lightbox-title">Image View</h4>
+                    <span id="lightbox-ratio-tag" class="meta-pill">1:1</span>
+                </div>
+                
+                <div class="lightbox-actions">
+                    <a id="lightbox-source-link" href="#" target="_blank" class="action-btn outline-btn">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Visit Website
+                    </a>
+                    <button id="lightbox-download-btn" class="action-btn primary-btn">
+                        <i class="fa-solid fa-download"></i> Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Files -->
+    <script src="/static/js/visualizer.js"></script>
+    <script src="/static/js/voice_agent.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
