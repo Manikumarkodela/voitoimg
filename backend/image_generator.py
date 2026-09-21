@@ -74,7 +74,7 @@ class ImageGenerator:
 
     def _generate_pollinations_multi_tier(self, prompt: str, aspect_ratio: str) -> Dict[str, Any]:
         """
-        Fail-Safe Provider: Tries Pollinations FLUX -> Pollinations Turbo -> Direct URL
+        Fail-Safe Provider: Fast Pollinations fetch with instant Direct URL fallback (guarantees zero Vercel timeout)
         """
         width, height = 1024, 1024
         if aspect_ratio == "16:9":
@@ -89,35 +89,35 @@ class ImageGenerator:
         encoded_prompt = urllib.parse.quote(prompt)
         seed = int(time.time() * 1000) % 1000000
 
-        models_to_try = ["flux", "turbo", "bimpay"]
+        image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&seed={seed}&model=flux&nologo=true"
 
-        for model in models_to_try:
-            image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&seed={seed}&model={model}&nologo=true"
-            try:
-                print(f"[ImageGenerator] Attempting Pollinations ({model})...")
-                response = requests.get(image_url, timeout=15)
-                if response.status_code == 200 and len(response.content) > 1000:
-                    img_b64 = base64.b64encode(response.content).decode('utf-8')
-                    return {
-                        "success": True,
-                        "branch": "Fallback",
-                        "provider": f"Pollinations ({model.upper()})",
-                        "image_url": f"data:image/jpeg;base64,{img_b64}",
-                        "direct_url": image_url,
-                        "prompt": prompt,
-                        "aspect_ratio": aspect_ratio
-                    }
-            except Exception as err:
-                print(f"[ImageGenerator] Pollinations model '{model}' failed: {err}")
+        # Try fast fetch for base64 encoding with a strict 3-second timeout
+        try:
+            print("[ImageGenerator] Attempting fast Pollinations fetch (3s limit)...")
+            response = requests.get(image_url, timeout=3)
+            if response.status_code == 200 and len(response.content) > 1000:
+                img_b64 = base64.b64encode(response.content).decode('utf-8')
+                return {
+                    "success": True,
+                    "branch": "Fallback",
+                    "provider": "Pollinations (FLUX)",
+                    "image_url": f"data:image/jpeg;base64,{img_b64}",
+                    "direct_url": image_url,
+                    "prompt": prompt,
+                    "aspect_ratio": aspect_ratio
+                }
+        except Exception as err:
+            print(f"[ImageGenerator] Fast fetch notice ({err}). Returning direct stream URL for instant rendering.")
 
-        # Final Direct URL Fallback (Never fail HTTP 500)
+        # Direct URL Fallback: Loaded directly by browser (0s Vercel backend overhead)
         direct_fallback_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&seed={seed}&nologo=true"
         return {
             "success": True,
             "branch": "DirectFallback",
-            "provider": "Pollinations Direct Stream",
+            "provider": "Pollinations AI",
             "image_url": direct_fallback_url,
             "direct_url": direct_fallback_url,
             "prompt": prompt,
             "aspect_ratio": aspect_ratio
         }
+

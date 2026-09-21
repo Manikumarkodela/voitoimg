@@ -60,6 +60,7 @@ class InternetSearchRequest(BaseModel):
 
 # API Endpoints
 @app.get("/api/health")
+@app.get("/health")
 def health_check():
     return {
         "status": "online",
@@ -70,6 +71,7 @@ def health_check():
     }
 
 @app.post("/api/enhance-prompt")
+@app.post("/enhance-prompt")
 def api_enhance_prompt(req: EnhancePromptRequest):
     if not req.prompt or not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
@@ -81,6 +83,7 @@ def api_enhance_prompt(req: EnhancePromptRequest):
     }
 
 @app.post("/api/generate")
+@app.post("/generate")
 def api_generate_image(req: GenerateRequest):
     if not req.prompt or not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Prompt cannot be empty.")
@@ -103,6 +106,7 @@ def api_generate_image(req: GenerateRequest):
         raise HTTPException(status_code=500, detail=f"Image generation failed: {str(e)}")
 
 @app.post("/api/search-internet-images")
+@app.post("/search-internet-images")
 def api_search_internet_images(req: InternetSearchRequest):
     if not req.prompt or not req.prompt.strip():
         raise HTTPException(status_code=400, detail="Search query cannot be empty.")
@@ -121,6 +125,7 @@ def api_search_internet_images(req: InternetSearchRequest):
     except Exception as e:
         print(f"[API Error] Internet image search failed: {e}")
         raise HTTPException(status_code=500, detail=f"Internet image search failed: {str(e)}")
+
 
 
 # Mount static files for frontend if frontend directory exists

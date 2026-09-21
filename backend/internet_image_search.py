@@ -137,9 +137,8 @@ class InternetImageSearcher:
         """
         results = []
         try:
-            # Token request
             token_url = f"https://duckduckgo.com/?q={urllib.parse.quote(query)}"
-            res = requests.get(token_url, headers=self.headers, timeout=8)
+            res = requests.get(token_url, headers=self.headers, timeout=3)
             match = re.search(r'vqd=([\d-]+)\&', res.text)
             if not match:
                 match = re.search(r'vqd=["\']([\d-]+)["\']', res.text)
@@ -155,7 +154,7 @@ class InternetImageSearcher:
                     "p": "1"
                 }
                 i_url = f"https://duckduckgo.com/i.js?{urllib.parse.urlencode(params)}"
-                i_res = requests.get(i_url, headers=self.headers, timeout=8)
+                i_res = requests.get(i_url, headers=self.headers, timeout=3)
                 if i_res.status_code == 200:
                     data = i_res.json()
                     for row in data.get("results", [])[:max_results]:
@@ -172,7 +171,7 @@ class InternetImageSearcher:
                                 "engine": "Web Image"
                             })
         except Exception as err:
-            print(f"[DDG Direct HTTP Scraper] Exception: {err}")
+            print(f"[DDG Direct HTTP Scraper] Notice: {err}")
         return results
 
     def _search_wikimedia(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
@@ -192,7 +191,7 @@ class InternetImageSearcher:
                 "iiprop": "url|size|mime",
                 "format": "json"
             }
-            res = requests.get(api_url, params=params, headers=self.headers, timeout=6)
+            res = requests.get(api_url, params=params, headers=self.headers, timeout=3)
             if res.status_code == 200:
                 data = res.json()
                 pages = data.get("query", {}).get("pages", {})
@@ -211,8 +210,9 @@ class InternetImageSearcher:
                             "engine": "Wikimedia Commons Web API"
                         })
         except Exception as err:
-            print(f"[Wikimedia API] Exception: {err}")
+            print(f"[Wikimedia API] Notice: {err}")
         return results
+
 
     def _search_unsplash_open(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """

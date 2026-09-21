@@ -321,7 +321,6 @@ document.addEventListener("DOMContentLoaded", () => {
         loadingDesc.textContent = "Fetching high-resolution web visuals matching prompt";
         searchQueryText.textContent = prompt;
         resultCountBadge.textContent = "Searching...";
-        // Results display state (no auto-scroll jumping)
         loadingBox.classList.remove("hidden");
 
         try {
@@ -334,7 +333,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify(payload)
             });
 
-            const data = await res.json();
+            let data;
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 80)}`);
+            }
+
             loadingBox.classList.add("hidden");
 
             if (!res.ok) throw new Error(data.detail || "Web search failed.");
@@ -385,7 +392,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify(payload)
             });
 
-            const data = await res.json();
+            let data;
+            const contentType = res.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                data = await res.json();
+            } else {
+                const text = await res.text();
+                throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 80)}`);
+            }
+
             loadingBox.classList.add("hidden");
 
             if (!res.ok) throw new Error(data.detail || "AI Image generation failed.");
