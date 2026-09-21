@@ -82,6 +82,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (plusPopoverMenu) plusPopoverMenu.classList.add("hidden");
         if (modeDropdownMenu) modeDropdownMenu.classList.add("hidden");
     }
+    function closePlusMenu() {
+        closeAllMenus();
+    }
 
     // Toggle Plus Popover Menu
     if (plusBtn && plusPopoverMenu) {
